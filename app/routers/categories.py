@@ -5,6 +5,7 @@ from app.models.category import Category
 from app.schemas.category import CategoryCreate, CategoryResponse
 from app.models.user import User
 from app.security import require_admin
+from app.models.product import Product
 
 
 router = APIRouter(prefix="/categories", tags=["categories"])
@@ -83,6 +84,11 @@ def delete_category(
     category_to_delete = db.query(Category).filter(Category.id == category_id).first()
 
     if not category_to_delete:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
+
+    produts = db.query(Product).filter(Product.category_id == category_id).all()
+
+    if not produts:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
 
     db.delete(category_to_delete)
